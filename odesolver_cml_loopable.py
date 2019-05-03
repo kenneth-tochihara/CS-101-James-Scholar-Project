@@ -12,7 +12,7 @@ from scitools.StringFunction import StringFunction
 from scipy.optimize import newton
 import numpy as np
 import matplotlib.pyplot as plt
-
+from datetime import datetime
 
 #------------------------------------------------------------------------------#
 # Constants using in the program                                               #
@@ -27,8 +27,6 @@ methods = {
     '3ab': "3rd-order Adams-Bashforth Method",
     'be' : "Backward-Euler Method"
 }
-
-ans = "y"
 
 #------------------------------------------------------------------------------#
 # Defining the functions utilized in this program                              #
@@ -84,52 +82,73 @@ def backwardEuler(u0, f):
         u.append(newton(findU, u0))
     return u
 
-while ans == "y":
-
-    # Taking in the values
-    f    = StringFunction(input("f(u, t) =  "), independent_variables=('u','t'))
-    u0   = float(input("u0 =  ")) #initial condition
-    dt   = float(input("dt = "))  #time step
-    T    = float(input("T = "))   #Final time of simulation
-    type = str(input("Solve Method: "))
-
-    #Initializing the u array, arrU and time array, arrT
-    arrU = []
-    currentT = 0
-    arrT = [currentT]
-    while (currentT < T) or (np.isclose(currentT, T)):
-        currentT += dt
-        arrT.append(currentT)
-
 #------------------------------------------------------------------------------#
-# Deciding which method to use (Forward-Euler is default)                      #
+# UI Management                                                                #
 #------------------------------------------------------------------------------#
 
-    if   ('fe'  == type):
-        arrU = forwardEuler(u0, f)
-    elif ('mp'  == type):
-        arrU = midPoint(u0, f)
-    elif ('2rk' == type):
-        arrU = rungeKutta2(u0, f)
-    elif ('4rk' == type):
-        arrU = rungeKutta4(u0, f)
-    elif ('3ab' == type):
-        N = int(input("N = "))
-        arrU = adamBashforth3(u0, f, N)
-    elif ('be' == type):
-        arrU = backwardEuler(u0, f)
-    else:
-        print("Method did not match.")
+# Clear the terminal for readability
+print("\033c" + "*************************************************")
+print("CS 101 James Scholar Project By Kenneth Tochihara")
+print("*************************************************")
+print("\nCtrl + C to exit at anytime. ")
 
+# Infinite loop until KeyboardInterrupt
+while True:
+
+    try:
+        # Taking in the values
+        f    = StringFunction(input("f(u, t) =  "), independent_variables=('u','t'))
+        u0   = float(input("u0 =  ")) #initial condition
+        dt   = float(input("dt = "))  #time step
+        T    = float(input("T = "))   #Final time of simulation
+        type = str(input("Solve Method: "))
+
+        #Initializing the u array, arrU and time array, arrT
+        arrU = []
+        currentT = 0
+        arrT = [currentT]
+        while (currentT < T) or (np.isclose(currentT, T)):
+            currentT += dt
+            arrT.append(currentT)
+
+#------------------------------------------------------------------------------#
+# Deciding which method to use                                                 #
+#------------------------------------------------------------------------------#
+
+        if   ('fe'  == type):
+            arrU = forwardEuler(u0, f)
+        elif ('mp'  == type):
+            arrU = midPoint(u0, f)
+        elif ('2rk' == type):
+            arrU = rungeKutta2(u0, f)
+        elif ('4rk' == type):
+            arrU = rungeKutta4(u0, f)
+        elif ('3ab' == type):
+            N = int(input("N = "))
+            arrU = adamBashforth3(u0, f, N)
+        elif ('be' == type):
+            arrU = backwardEuler(u0, f)
+        else:
+            print("Method did not match.")
 
 #------------------------------------------------------------------------------#
 # Saving the plot as a picture                                                 #
 #------------------------------------------------------------------------------#
+        # Plotting the function
+        plt.plot(arrT, arrU, "bo")
+        plt.title("Solution to F: U vs. T (" + methods[type]+ ")")
+        plt.xlabel("t")
+        plt.ylabel("u")
 
-    plt.plot(arrT, arrU, "bo")
-    plt.title("Solution to F: U vs. T (" + methods[type]+ ")")
-    plt.xlabel("t")
-    plt.ylabel("u")
-    plt.savefig('plot.png')
+        # Saving the file to directory Saved-Figures
+        today = datetime.now()
+        plt.savefig('Saved-Figures/plot_'+ today.isoformat()[:-7].replace(":", "-", 2)  + '.png')
+        print( "Saved plot_"+ today.isoformat()[:-7] + ".png")
 
-    ans = input("Enter 'y' to continue.")
+#------------------------------------------------------------------------------#
+# End program                                                                  #
+#------------------------------------------------------------------------------#
+
+    except KeyboardInterrupt:
+        print("You have successfully ended the program. ")
+        break
