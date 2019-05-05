@@ -136,6 +136,7 @@ while True:
 #------------------------------------------------------------------------------#
         # Plotting the function
         plt.plot(arrT, arrU, "bo")
+        plt.show()
         plt.title("Solution to F: U vs. T (" + methods[type]+ ")")
         plt.xlabel("t")
         plt.ylabel("u")
@@ -144,6 +145,7 @@ while True:
         today = datetime.now()
         plt.savefig('Saved-Figures/plot_'+ today.isoformat()[:-7].replace(":", "-", 2)  + '.png')
         print( "Saved plot_"+ today.isoformat()[:-7] + ".png")
+        plt.clf()
 
 #------------------------------------------------------------------------------#
 # End program                                                                  #
