@@ -25,6 +25,7 @@ methods = {
     '2rk': "2nd-Order Runge-Kutta Method",
     '4rk': "4th-Order Runge-Kutta Method",
     '3ab': "3rd-order Adams-Bashforth Method",
+    'mpi': "Midpoint Point With Iterations Method",
     'be' : "Backward-Euler Method"
 }
 
@@ -64,7 +65,18 @@ def rungeKutta4(u0, f):
         u.append(u[i] + (1/6) * (k1 + 2*k2 + 2*k3 + k4))
     return u
 
-def adamBashforth3(u0, f, N):
+def adamBashforth3(u0, f):
+    k1 = float(f(u0, arrT[0]))
+    u = [u0, u0 + (dt * float(f(u0 + 0.5 * k1, arrT[0] + 0.5 * dt)))]
+
+    k1 = float(f(u[1], arrT[1]))
+    u.append(u[1]+(dt * float(f(u[1] + 0.5 * k1, arrT[1] + 0.5 * dt))))
+
+    for i in range(2, len(arrT)-1):
+        u.append(u[i] + (dt/12)*(23*f(u[i], arrT[i]) - 16*f(u[i-1], arrT[i-1]) + 5*f(u[i-2], arrT[i-2])))
+    return u
+
+def midPointIterations(u0, f, N):
     u = [u0]
     for i in range(len(arrT)-1):
         v = [u[i]]
@@ -124,8 +136,10 @@ while True:
         elif ('4rk' == type):
             arrU = rungeKutta4(u0, f)
         elif ('3ab' == type):
+            arrU = adamBashforth3(u0, f)
+        elif ('mpi' == type):
             N = int(input("N = "))
-            arrU = adamBashforth3(u0, f, N)
+            arrU = midPointIterations(u0, f, N)
         elif ('be' == type):
             arrU = backwardEuler(u0, f)
         else:
